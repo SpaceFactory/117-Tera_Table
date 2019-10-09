@@ -3,9 +3,10 @@ from pycomm.ab_comm.clx import Driver as ClxDriver
 import threading
 import logging
 import socket
+import json
 import time
 import sys
-import json
+
 
 '''
     This program has two threads:
@@ -51,7 +52,7 @@ def reset():
     # Stop automatic motion
     print("Stop  Motion", c.write_tag('Stop_Motion', 1, 'BOOL'))
     print("Stop  Motion", c.write_tag('Stop_Motion', 0, 'BOOL'))
-    
+
     _resp = c.read_tag(['Set_Home'])
     if _resp[0][1] == 1:
         print("Stop  Motion", c.write_tag('Stop_Motion', 0, 'BOOL'))
@@ -96,11 +97,10 @@ def gotoMotion(angle, speed, direction):
         print(c.write_tag('Goto_Deg', angle, 'REAL'))
         print(c.write_tag('GT_Start_Req', 1, 'BOOL'))
         c.close()
-        print('Executed goto function successfully')
         return True
 
-    except:
-        print('Exception encountered in gotoMotion')
+    except Exception as e:
+        print('Exception encountered in gotoMotion ',e)
         return False
 
 
@@ -117,8 +117,8 @@ def relativeMotion(angle, speed):
         c.close()
         return True
 
-    except:
-        print('Exception encountered in relativeMotion')
+    except Exception as e:
+        print('Exception encountered in relativeMotion',e)
         return False
 
 
@@ -132,7 +132,7 @@ def setHome():
         return True
 
     except:
-        print('Exception encountered in setHome')
+        print('Exception encountered in setHome ',e)
         return False
 
 
@@ -194,20 +194,16 @@ def motionControl():
                 curr_index = -1
                 speed = message_json['speed']
                 points = message_json['points']
-                print('Speed for goto ', speed)
-                print('Points for goto ', points)
-                # start_point = points[0]
                 stop_point = points[-1]
 
-                # Finding clk/anti-clk through 4 consecutive points
+                # Finding clk/anti-clk direction through 4 consecutive points
                 diff1 = 1 if (points[1] - points[0]) > 0 else -1
                 diff2 = 1 if (points[2] - points[1]) > 0 else -1
                 diff3 = 1 if (points[3] - points[2]) > 0 else -1
-
                 direction = 1 if (diff1 + diff2 + diff3) > 0 else 2
-                print('Direction for goto ', direction)
+
                 returned_value = gotoMotion(stop_point, speed, direction)
-                conn.send("gotoSuccess".encode())
+                conn.send(str(returned_value).encode())
 
             # if command is relative
             elif(command == 'relative'):
@@ -222,21 +218,25 @@ def motionControl():
                     final_position = (initial_position + angle)
                 returned_value = relativeMotion(angle, speed)
                 command = None
+                conn.send(str(returned_value).encode())
 
             #  if command is  setHome
             elif(command == 'setHome'):
                 returned_value = setHome()
                 command = None
+                conn.send(str(returned_value).encode())
 
             # if command is reset
             elif(command == 'reset'):
                 returned_value = resetDriver()
                 command = None
+                conn.send(str(returned_value).encode())
 
             # if command is getPosition
             elif(command == 'getPosition'):
                 returned_value = resetDriver()
                 command = None
+                conn.send(str(returned_value).encode())
 
             # # if command is getPosition
             # elif(command == 'getCurrentIndex'):
@@ -250,6 +250,7 @@ def motionControl():
                 print('No proper command sent')
                 returned_value = False
                 command = None
+                conn.send(str(returned_value).encode())
 
             # sending periodic updates if the command is goto
             if (returned_value and command == 'goto'):
@@ -274,7 +275,6 @@ def motionControl():
                     time.sleep(0.01)
                     # At this point the table has completed a full wall Section
                 curr_index =  points.index(_completed[-1])
-                print('Closing connection to PLC')
                 c.close()
                 returned_value = False
                 command = None
@@ -285,16 +285,16 @@ def motionControl():
             time.sleep(0.05)
 
 
-# gotoMotion(88, 100, 3)
-
-t = threading.Thread(target=motionControl)
-t.start()
+#gotoMotion(88, 100, 3)
+#t.start()
 print('Thread started sucessfully waiting for connection')
+# Establish connection with client by accepting client request to connect.
 conn, addr = s.accept()
 print("True")
+
 while True:
     try:
-        # Establish connection with client by accepting client request to connect.
+
         # conn, addr = s.accept()
 
         # size of data chunk read at a time in bytes
@@ -304,14 +304,27 @@ while True:
         message_json = json.loads(str(data))
         command = message_json['command']
 
-
         if command == 'getCurrentIndex':
            #print("request from robot ")
            conn.send(str(curr_index).encode())
-        #print('finished sending to client')
-
-    except Exception as e:
-        print('Encountered exception inside main while loop and closing connection ', e)
-        conn.send('Exception'.encode())
+           #print('finished sending to client')
+    except socket.error as e:
+        print('Socket error exception ',e)
+        #stop/reset table in case of error
+        resetDriver()
         conn.close()
         conn, addr = s.accept()
+
+    except KeyError as e:
+        print('Key error exception ', e)
+        #stop/reset table in case of error
+        resetDriver()
+        #send value -1 to indicate False or error
+        conn.send('-1'.encode())
+
+    except Exception as e:
+        print('inside final exception ', e)
+        #stop/table in case of error
+        resetDriver()
+        #send value -1 to indicate False or error
+        conn.send('-1'.encode())
