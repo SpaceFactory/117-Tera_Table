@@ -86,6 +86,7 @@ def reset():
     _resp = c.read_tag(['Set_Home'])
     if _resp[0][1] == 1:
         print("Setting Home: ", c.write_tag(('Set_Home', 0, 'BOOL')))
+    print("Gear Ratio:", c.write_tag('Gear_Ratio',0.9793333, 'REAL'))
 
 
 def gotoMotion(angle, speed, direction):

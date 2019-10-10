@@ -42,3 +42,4 @@ def reset(c):
     print("Speed: ", 50, c.write_tag(('jog_ST_Speed', 50, 'REAL')))
     print("Speed: ", 50, c.write_tag(('ST_Speed', 50, 'REAL')))
     print("Speed: ", 50, c.write_tag(('time_ST_Speed', 50, 'REAL')))
+    print("Gear Ratio:", c.write_tag('Gear_Ratio',0.9793333, 'REAL'))

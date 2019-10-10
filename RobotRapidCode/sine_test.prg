@@ -13,9 +13,10 @@ MODULE Module1
 	CONST speeddata vel25 := [25,25,25,25];
 
     PROC main()
-	     SocketClose socket;
-         SocketCreate socket;
-         SocketConnect socket, "192.168.1.69", 12346;
+	   SocketClose socket;
+     SocketCreate socket;
+     SocketConnect socket, "192.168.1.69", 12346;
+
 		 ConfJ \Off;
 		 ConfL \Off;
 
@@ -36,7 +37,7 @@ MODULE Module1
 
         MoveL [[1654.7, 407.1, -1205], [0.0, 0.95358, -0.30114, 0.0], [0,0,0,0], [0,9E9,9E9,9E9,9E9,9E9]], vel100, z10, t_extruder\WObj:=WObj0;
 
-        Wait4Feedback(0);
+       Wait4Feedback(0);
 		MoveL [[1963.9, 358.8, -1205], [0.0, 0.95358, -0.30114, 0.0], [0,0,0,0], [0,9E9,9E9,9E9,9E9,9E9]], vel100, z10, t_extruder\WObj:=WObj0;
 
         Wait4Feedback(1);
@@ -49,6 +50,24 @@ MODULE Module1
 
         Wait4Feedback(3);
 		MoveL [[1654.7, 407.1, -1205], [0.0, 0.95358, -0.30114, 0.0], [0,0,0,0], [0,9E9,9E9,9E9,9E9,9E9]], vel100, z10, t_extruder\WObj:=WObj0;
+
+
+
+     !test for ""points"": [129,119,109,99,89] to make programming for James easier
+     server_send("{ ""command"": ""goto"",  ""speed"": 25,  ""points"": [119,109,99,89]}");
+
+  MoveL [[1963.9, 358.8, -1205], [0.0, 0.95358, -0.30114, 0.0], [0,0,0,0], [0,9E9,9E9,9E9,9E9,9E9]], vel100, z10, t_extruder\WObj:=WObj0;
+
+      Wait4Feedback(0);
+  MoveL [[1654.7, 407.1, -1205], [0.0, 0.95358, -0.30114, 0.0], [0,0,0,0], [0,9E9,9E9,9E9,9E9,9E9]], vel100, z10, t_extruder\WObj:=WObj0;
+
+
+     Wait4Feedback(1);
+  MoveL [[1963.9, 358.8, -1205], [0.0, 0.95358, -0.30114, 0.0], [0,0,0,0], [0,9E9,9E9,9E9,9E9,9E9]], vel100, z10, t_extruder\WObj:=WObj0;
+
+
+    Wait4Feedback(2);
+MoveL [[1654.7, 407.1, -1205], [0.0, 0.95358, -0.30114, 0.0], [0,0,0,0], [0,9E9,9E9,9E9,9E9,9E9]], vel100, z10, t_extruder\WObj:=WObj0;
 
         IndCMove M7DM1,1,0;
         WaitTime 1.5;
