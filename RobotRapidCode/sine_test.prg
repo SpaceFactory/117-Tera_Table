@@ -27,7 +27,7 @@ MODULE Module1
 		WaitTime 1;
 
         !Start position for robot
-		MoveL [[1963.9, 358.8,-1050 ], [0.0, 0.95358, -0.30114, 0.0], [0,0,0,0], [0,9E9,9E9,9E9,9E9,9E9]], vel100, z10, t_extruder\WObj:=WObj0;
+		MoveL [[1963.9, 358.8, -1205], [0.0, 0.95358, -0.30114, 0.0], [0,0,0,0], [0,9E9,9E9,9E9,9E9,9E9]], vel100, z10, t_extruder\WObj:=WObj0;
 
 		!Start table
         IndCMove M7DM1,1,1000;
@@ -35,43 +35,39 @@ MODULE Module1
         server_send("{ ""command"": ""goto"",  ""speed"": 25,  ""points"": [89,99,109,119,129]}");
 
 
-        MoveL [[1654.7, 407.1, -1050], [0.0, 0.95358, -0.30114, 0.0], [0,0,0,0], [0,9E9,9E9,9E9,9E9,9E9]], vel100, z10, t_extruder\WObj:=WObj0;
+        MoveL [[1654.7, 407.1, -1205], [0.0, 0.95358, -0.30114, 0.0], [0,0,0,0], [0,9E9,9E9,9E9,9E9,9E9]], vel100, z10, t_extruder\WObj:=WObj0;
 
        Wait4Feedback(0);
-		MoveL [[1963.9, 358.8, -1050], [0.0, 0.95358, -0.30114, 0.0], [0,0,0,0], [0,9E9,9E9,9E9,9E9,9E9]], vel100, z10, t_extruder\WObj:=WObj0;
+		MoveL [[1963.9, 358.8, -1205], [0.0, 0.95358, -0.30114, 0.0], [0,0,0,0], [0,9E9,9E9,9E9,9E9,9E9]], vel100, z10, t_extruder\WObj:=WObj0;
 
         Wait4Feedback(1);
-		MoveL [[1654.7, 407.1, -1050], [0.0, 0.95358, -0.30114, 0.0], [0,0,0,0], [0,9E9,9E9,9E9,9E9,9E9]], vel100, z10, t_extruder\WObj:=WObj0;
+		MoveL [[1654.7, 407.1, -1205], [0.0, 0.95358, -0.30114, 0.0], [0,0,0,0], [0,9E9,9E9,9E9,9E9,9E9]], vel100, z10, t_extruder\WObj:=WObj0;
 
 
         Wait4Feedback(2);
-		MoveL [[1963.9, 358.8, -1050], [0.0, 0.95358, -0.30114, 0.0], [0,0,0,0], [0,9E9,9E9,9E9,9E9,9E9]], vel100, z10, t_extruder\WObj:=WObj0;
+		MoveL [[1963.9, 358.8, -1205], [0.0, 0.95358, -0.30114, 0.0], [0,0,0,0], [0,9E9,9E9,9E9,9E9,9E9]], vel100, z10, t_extruder\WObj:=WObj0;
 
 
         Wait4Feedback(3);
-		MoveL [[1654.7, 407.1, -1050], [0.0, 0.95358, -0.30114, 0.0], [0,0,0,0], [0,9E9,9E9,9E9,9E9,9E9]], vel100, z10, t_extruder\WObj:=WObj0;
+		MoveL [[1654.7, 407.1, -1205], [0.0, 0.95358, -0.30114, 0.0], [0,0,0,0], [0,9E9,9E9,9E9,9E9,9E9]], vel100, z10, t_extruder\WObj:=WObj0;
 
 
-   Wait4Feedback(4);
+
      !test for ""points"": [129,119,109,99,89] to make programming for James easier
      server_send("{ ""command"": ""goto"",  ""speed"": 25,  ""points"": [119,109,99,89]}");
 
-  MoveL [[1963.9, 358.8, -1044], [0.0, 0.95358, -0.30114, 0.0], [0,0,0,0], [0,9E9,9E9,9E9,9E9,9E9]], vel100, z10, t_extruder\WObj:=WObj0;
+  MoveL [[1963.9, 358.8, -1205], [0.0, 0.95358, -0.30114, 0.0], [0,0,0,0], [0,9E9,9E9,9E9,9E9,9E9]], vel100, z10, t_extruder\WObj:=WObj0;
 
       Wait4Feedback(0);
-  MoveL [[1654.7, 407.1, -1044], [0.0, 0.95358, -0.30114, 0.0], [0,0,0,0], [0,9E9,9E9,9E9,9E9,9E9]], vel100, z10, t_extruder\WObj:=WObj0;
+  MoveL [[1654.7, 407.1, -1205], [0.0, 0.95358, -0.30114, 0.0], [0,0,0,0], [0,9E9,9E9,9E9,9E9,9E9]], vel100, z10, t_extruder\WObj:=WObj0;
 
 
      Wait4Feedback(1);
-  MoveL [[1963.9, 358.8, -1044], [0.0, 0.95358, -0.30114, 0.0], [0,0,0,0], [0,9E9,9E9,9E9,9E9,9E9]], vel100, z10, t_extruder\WObj:=WObj0;
+  MoveL [[1963.9, 358.8, -1205], [0.0, 0.95358, -0.30114, 0.0], [0,0,0,0], [0,9E9,9E9,9E9,9E9,9E9]], vel100, z10, t_extruder\WObj:=WObj0;
 
 
     Wait4Feedback(2);
-MoveL [[1654.7, 407.1, -1044], [0.0, 0.95358, -0.30114, 0.0], [0,0,0,0], [0,9E9,9E9,9E9,9E9,9E9]], vel100, z10, t_extruder\WObj:=WObj0;
-
-    Wait4Feedback(3);
-MoveL [[1963.9, 358.8, -1044], [0.0, 0.95358, -0.30114, 0.0], [0,0,0,0], [0,9E9,9E9,9E9,9E9,9E9]], vel100, z10, t_extruder\WObj:=WObj0;
-
+MoveL [[1654.7, 407.1, -1205], [0.0, 0.95358, -0.30114, 0.0], [0,0,0,0], [0,9E9,9E9,9E9,9E9,9E9]], vel100, z10, t_extruder\WObj:=WObj0;
 
         IndCMove M7DM1,1,0;
         WaitTime 1.5;
