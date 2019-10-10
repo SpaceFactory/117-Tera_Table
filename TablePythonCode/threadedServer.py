@@ -291,8 +291,7 @@ def motionControl():
 print('Thread started sucessfully waiting for connection')
 # Establish connection with client by accepting client request to connect.
 conn, addr = s.accept()
-print("True")
-
+print("Got new connection and waiting for data")
 while True:
     try:
 
