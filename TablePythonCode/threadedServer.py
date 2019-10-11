@@ -45,13 +45,13 @@ def reset():
         This is called by one of the motion options in the PLC thread.
         :. It must already by opened when the function is called.
     '''
-    print("Driver Reset: ", c.write_tag(
-        'Drive_1_Command.RESET', 1, 'BOOL'))
-    print("Driver Reset: ", c.write_tag(
-        'Drive_1_Command.RESET', 0, 'BOOL'))
+    #print("Driver Reset: ", c.write_tag(
+    #    'Drive_1_Command.RESET', 1, 'BOOL'))
+    #print("Driver Reset: ", c.write_tag(
+    #    'Drive_1_Command.RESET', 0, 'BOOL'))
     # Stop automatic motion
-    print("Stop  Motion", c.write_tag('Stop_Motion', 1, 'BOOL'))
-    print("Stop  Motion", c.write_tag('Stop_Motion', 0, 'BOOL'))
+    #print("Stop  Motion", c.write_tag('Stop_Motion', 1, 'BOOL'))
+    #print("Stop  Motion", c.write_tag('Stop_Motion', 0, 'BOOL'))
 
     _resp = c.read_tag(['Set_Home'])
     if _resp[0][1] == 1:
@@ -86,7 +86,7 @@ def reset():
     _resp = c.read_tag(['Set_Home'])
     if _resp[0][1] == 1:
         print("Setting Home: ", c.write_tag(('Set_Home', 0, 'BOOL')))
-    print("Gear Ratio:", c.write_tag('Gear_Ratio',0.9793333, 'REAL'))
+    #print("Gear Ratio:", c.write_tag('Gear_Ratio',0.9793333, 'REAL'))
 
 
 def gotoMotion(angle, speed, direction):
@@ -204,7 +204,8 @@ def motionControl():
                 direction = 1 if (diff1 + diff2 + diff3) > 0 else 2
 
                 returned_value = gotoMotion(stop_point, speed, direction)
-                conn.send(str(returned_value).encode())
+                print('Goto executed')
+                conn.send(str("ok").encode())
 
             # if command is relative
             elif(command == 'relative'):
@@ -275,7 +276,7 @@ def motionControl():
                     current_position = readPosition()
                     time.sleep(0.01)
                     # At this point the table has completed a full wall Section
-                curr_index =  points.index(_completed[-1])
+                curr_index =  len(points)-1
                 c.close()
                 returned_value = False
                 command = None
@@ -286,13 +287,12 @@ def motionControl():
             time.sleep(0.05)
 
 
-#gotoMotion(88, 100, 3)
-#t.start()
+t = threading.Thread(target=motionControl)
+t.start()
 print('Thread started sucessfully waiting for connection')
 # Establish connection with client by accepting client request to connect.
 conn, addr = s.accept()
-print("True")
-
+print("Got new connection and waiting for data")
 while True:
     try:
 
@@ -300,7 +300,7 @@ while True:
 
         # size of data chunk read at a time in bytes
         data = conn.recv(1024)
-        #print('data received from client before parsing as json ', data)
+        print('data received from client before parsing as json ', data)
         # convert data to string and  to json
         message_json = json.loads(str(data))
         command = message_json['command']

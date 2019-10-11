@@ -9,13 +9,14 @@ MODULE Module1
 
 	CONST speeddata vel20 := [20,20,20,20];
 	CONST speeddata vel100 := [100,100,100,100];
+  CONST speeddata vel45 := [45.12,45.12,45.12,45.12];
 	CONST speeddata vel75 := [75,75,75,75];
 	CONST speeddata vel25 := [25,25,25,25];
 
     PROC main()
 	   SocketClose socket;
      SocketCreate socket;
-     SocketConnect socket, "192.168.1.69", 12346;
+     SocketConnect socket, "192.168.1.61", 12346;
 
 		 ConfJ \Off;
 		 ConfL \Off;
@@ -27,52 +28,62 @@ MODULE Module1
 		WaitTime 1;
 
         !Start position for robot
-		MoveL [[1963.9, 358.8, -1205], [0.0, 0.95358, -0.30114, 0.0], [0,0,0,0], [0,9E9,9E9,9E9,9E9,9E9]], vel100, z10, t_extruder\WObj:=WObj0;
+        MoveL [[1654.7, 407.1, -1205], [0.0, 0.95358, -0.30114, 0.0], [0,0,0,0], [0,9E9,9E9,9E9,9E9,9E9]], vel45, z10, t_extruder\WObj:=WObj0;
+
 
 		!Start table
-        IndCMove M7DM1,1,1000;
-        WaitTime 4;
-        server_send("{ ""command"": ""goto"",  ""speed"": 25,  ""points"": [89,99,109,119,129]}");
+        IndCMove M7DM1,1,500;
+        WaitTime 2.5;
+        MoveL [[1963.9, 358.8, -1205], [0.0, 0.95358, -0.30114, 0.0], [0,0,0,0], [0,9E9,9E9,9E9,9E9,9E9]], vel45, z10, t_extruder\WObj:=WObj0;
 
 
-        MoveL [[1654.7, 407.1, -1205], [0.0, 0.95358, -0.30114, 0.0], [0,0,0,0], [0,9E9,9E9,9E9,9E9,9E9]], vel100, z10, t_extruder\WObj:=WObj0;
+        server_send("{ ""command"": ""goto"",  ""speed"": 28.224,  ""points"": [89,99,109,119,129]}");
+
+
+        MoveL [[1654.7, 407.1, -1205], [0.0, 0.95358, -0.30114, 0.0], [0,0,0,0], [0,9E9,9E9,9E9,9E9,9E9]], vel45, z10, t_extruder\WObj:=WObj0;
 
        Wait4Feedback(0);
-		MoveL [[1963.9, 358.8, -1205], [0.0, 0.95358, -0.30114, 0.0], [0,0,0,0], [0,9E9,9E9,9E9,9E9,9E9]], vel100, z10, t_extruder\WObj:=WObj0;
+		MoveL [[1963.9, 358.8, -1205], [0.0, 0.95358, -0.30114, 0.0], [0,0,0,0], [0,9E9,9E9,9E9,9E9,9E9]], vel45, z10, t_extruder\WObj:=WObj0;
 
         Wait4Feedback(1);
-		MoveL [[1654.7, 407.1, -1205], [0.0, 0.95358, -0.30114, 0.0], [0,0,0,0], [0,9E9,9E9,9E9,9E9,9E9]], vel100, z10, t_extruder\WObj:=WObj0;
+		MoveL [[1654.7, 407.1, -1205], [0.0, 0.95358, -0.30114, 0.0], [0,0,0,0], [0,9E9,9E9,9E9,9E9,9E9]], vel45, z10, t_extruder\WObj:=WObj0;
 
 
         Wait4Feedback(2);
-		MoveL [[1963.9, 358.8, -1205], [0.0, 0.95358, -0.30114, 0.0], [0,0,0,0], [0,9E9,9E9,9E9,9E9,9E9]], vel100, z10, t_extruder\WObj:=WObj0;
+		MoveL [[1963.9, 358.8, -1205], [0.0, 0.95358, -0.30114, 0.0], [0,0,0,0], [0,9E9,9E9,9E9,9E9,9E9]], vel45, z10, t_extruder\WObj:=WObj0;
 
 
         Wait4Feedback(3);
-		MoveL [[1654.7, 407.1, -1205], [0.0, 0.95358, -0.30114, 0.0], [0,0,0,0], [0,9E9,9E9,9E9,9E9,9E9]], vel100, z10, t_extruder\WObj:=WObj0;
-
-
+		MoveL [[1654.7, 407.1, -1205], [0.0, 0.95358, -0.30114, 0.0], [0,0,0,0], [0,9E9,9E9,9E9,9E9,9E9]], vel45, z10, t_extruder\WObj:=WObj0;
+        Wait4Feedback(4);
+    !WaitTime 2.5;
 
      !test for ""points"": [129,119,109,99,89] to make programming for James easier
-     server_send("{ ""command"": ""goto"",  ""speed"": 25,  ""points"": [119,109,99,89]}");
+     server_send("{ ""command"": ""goto"",  ""speed"": 28.224,  ""points"": [119,109,99,89,79]}");
 
-  MoveL [[1963.9, 358.8, -1205], [0.0, 0.95358, -0.30114, 0.0], [0,0,0,0], [0,9E9,9E9,9E9,9E9,9E9]], vel100, z10, t_extruder\WObj:=WObj0;
+  MoveL [[1963.9, 358.8, -1199], [0.0, 0.95358, -0.30114, 0.0], [0,0,0,0], [0,9E9,9E9,9E9,9E9,9E9]], vel45, z10, t_extruder\WObj:=WObj0;
 
       Wait4Feedback(0);
-  MoveL [[1654.7, 407.1, -1205], [0.0, 0.95358, -0.30114, 0.0], [0,0,0,0], [0,9E9,9E9,9E9,9E9,9E9]], vel100, z10, t_extruder\WObj:=WObj0;
+  MoveL [[1654.7, 407.1, -1199], [0.0, 0.95358, -0.30114, 0.0], [0,0,0,0], [0,9E9,9E9,9E9,9E9,9E9]], vel45, z10, t_extruder\WObj:=WObj0;
 
 
      Wait4Feedback(1);
-  MoveL [[1963.9, 358.8, -1205], [0.0, 0.95358, -0.30114, 0.0], [0,0,0,0], [0,9E9,9E9,9E9,9E9,9E9]], vel100, z10, t_extruder\WObj:=WObj0;
+  MoveL [[1963.9, 358.8, -1199], [0.0, 0.95358, -0.30114, 0.0], [0,0,0,0], [0,9E9,9E9,9E9,9E9,9E9]], vel45, z10, t_extruder\WObj:=WObj0;
 
 
-    Wait4Feedback(2);
-MoveL [[1654.7, 407.1, -1205], [0.0, 0.95358, -0.30114, 0.0], [0,0,0,0], [0,9E9,9E9,9E9,9E9,9E9]], vel100, z10, t_extruder\WObj:=WObj0;
+     Wait4Feedback(2);
+  MoveL [[1654.7, 407.1, -1199], [0.0, 0.95358, -0.30114, 0.0], [0,0,0,0], [0,9E9,9E9,9E9,9E9,9E9]], vel45, z10, t_extruder\WObj:=WObj0;
 
-        IndCMove M7DM1,1,0;
-        WaitTime 1.5;
-        IndReset M7DM1,1\RefNum:=0\Short;
-        WaitTime 1.5;
+     Wait4Feedback(3);
+MoveL [[1963.9, 358.8, -1205], [0.0, 0.95358, -0.30114, 0.0], [0,0,0,0], [0,9E9,9E9,9E9,9E9,9E9]], vel45, z10, t_extruder\WObj:=WObj0;
+
+Wait4Feedback(4)
+
+
+      IndCMove M7DM1,1,0;
+      WaitTime 1.5;
+      IndReset M7DM1,1\RefNum:=0\Short;
+      WaitTime 1.5;
 
 
         SocketClose socket;
@@ -89,10 +100,10 @@ MoveL [[1654.7, 407.1, -1205], [0.0, 0.95358, -0.30114, 0.0], [0,0,0,0], [0,9E9,
 
     ERROR
         IF ERRNO=ERR_SOCK_TIMEOUT THEN
-            !RETRY;
+            RETRY;
         ELSEIF ERRNO=ERR_SOCK_CLOSED THEN
-            !client_recover;
-            !RETRY;
+            client_recover;
+            RETRY;
         ELSE
             !No error recovery handling
         ENDIF
@@ -115,7 +126,7 @@ MoveL [[1654.7, 407.1, -1205], [0.0, 0.95358, -0.30114, 0.0], [0,0,0,0], [0,9E9,
             ok := StrToVal(receive_string, latest_position);
 
         ENDWHILE
-		!TPWrite receive_string;
+		TPWrite receive_string;
 
     ENDPROC
 
@@ -125,14 +136,14 @@ MoveL [[1654.7, 407.1, -1205], [0.0, 0.95358, -0.30114, 0.0], [0,0,0,0], [0,9E9,
     PROC client_recover()
         SocketClose socket;
         SocketCreate socket;
-        SocketConnect socket, "192.168.1.69", 12346;
+        SocketConnect socket, "192.168.1.61", 12346;
         !server ip address and port number
 
     ERROR
         IF ERRNO=ERR_SOCK_TIMEOUT THEN
-            !RETRY;
+            RETRY;
         ELSEIF ERRNO=ERR_SOCK_CLOSED THEN
-            !RETRY;
+            RETRY;
         ELSE
             !No error
         ENDIF
