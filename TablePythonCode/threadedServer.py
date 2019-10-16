@@ -17,12 +17,13 @@ import sys
 # Section related to socket communication
 s = socket.socket()
 port = 12346
+
 s.bind(('', port))
 s.listen(1)
 
 # some global variables for the PLC Thread
 plc_ip_address = '192.168.1.5'
-accuracy_desired = 0.05  # accuracy desired in degree
+accuracy_desired = 0.1  # accuracy desired in degree
 message_json = None
 command = None
 
@@ -150,7 +151,7 @@ def readPosition():
 
     except:
         print('Exception encountered in readPosition')
-        return False
+        return -1
 
 
 # resets the driver
@@ -190,7 +191,6 @@ def motionControl():
     while True:
         #print('"', command, '"')
         if command is not None:
-            # if command is goto
             if(command == 'goto'):
                 curr_index = -1
                 speed = message_json['speed']
@@ -240,6 +240,17 @@ def motionControl():
                 command = None
                 conn.send(str(returned_value).encode())
 
+            #  if command is  setHome
+            elif(command == 'goto@'):
+                curr_index = -1
+                speed = message_json['speed']
+                stop_point = message_json['point']
+                direction = 3 #best way
+                returned_value = gotoMotion(stop_point, speed, direction)
+                print('Goto@ executed')
+                conn.send(str("ok").encode())
+
+
             # # if command is getPosition
             # elif(command == 'getCurrentIndex'):
             #     global curr_index
@@ -253,6 +264,21 @@ def motionControl():
                 returned_value = False
                 command = None
                 conn.send(str(returned_value).encode())
+
+            #if command is goto@ send the last update
+            if(returned_value and command == 'goto@'):
+               c.open(plc_ip_address)
+               current_position = readPosition()
+               final_position = (message_json['point'])
+               print('inside got@')
+               while(abs(final_position - current_position) > accuracy_desired):
+                   current_position = readPosition()
+                   #print('current_position in goto@ ',current_position)
+                   time.sleep(0.01)
+               curr_index =  0
+               c.close()
+               command = None
+
 
             # sending periodic updates if the command is goto
             if (returned_value and command == 'goto'):
@@ -274,17 +300,19 @@ def motionControl():
                         print('Completed ', _completed)
                         curr_index =  points.index(_completed[-1])
                     current_position = readPosition()
-                    time.sleep(0.01)
+                    time.sleep(0.005)
                     # At this point the table has completed a full wall Section
                 curr_index =  len(points)-1
+                print('Completed ', points[curr_index])
                 c.close()
                 returned_value = False
                 command = None
+                message_json = None
 
         else:
             # wait and check again
             # as not to waste too many cycles on None
-            time.sleep(0.05)
+            time.sleep(0.01);
 
 
 t = threading.Thread(target=motionControl)
@@ -295,37 +323,59 @@ conn, addr = s.accept()
 print("Got new connection and waiting for data")
 while True:
     try:
-
-        # conn, addr = s.accept()
-
-        # size of data chunk read at a time in bytes
+        message = ""
         data = conn.recv(1024)
-        print('data received from client before parsing as json ', data)
-        # convert data to string and  to json
-        message_json = json.loads(str(data))
-        command = message_json['command']
+        if "goto" in str(data):
+            curr_index = -1
+            conn.send("OK".encode())
+            message = message + str(data)
+            while '}' not in str(data):
+                data = conn.recv(1024)
+                conn.send("OK".encode())
+                message = message + str(data)
 
-        if command == 'getCurrentIndex':
+            message_json = json.loads(str(message))
+            command = 'goto'
+        #this goto command just send one feedback at the end
+        if "goto@" in str(data):
+            curr_index = -1
+            message_json = json.loads(str(message))
+            command = 'goto@'
+
+
+        if "getCurrentIndex" in str(data):
            #print("request from robot ")
+           #print(curr_index)
+           #print(curr_index);
            conn.send(str(curr_index).encode())
            #print('finished sending to client')
+
     except socket.error as e:
+        print('    ')
         print('Socket error exception ',e)
+        print('    ')
+        time.sleep(2)
         #stop/reset table in case of error
         resetDriver()
         conn.close()
         conn, addr = s.accept()
 
     except KeyError as e:
+        print('    ')
         print('Key error exception ', e)
+        print('    ')
+        time.sleep(2)
         #stop/reset table in case of error
         resetDriver()
         #send value -1 to indicate False or error
         conn.send('-1'.encode())
 
     except Exception as e:
-        print('inside final exception ', e)
+#        print('    ')
+        print('Inside final exception ', e)
+#        print('    ')
+#        time.sleep(2)
         #stop/table in case of error
-        resetDriver()
+        #resetDriver()
         #send value -1 to indicate False or error
-        conn.send('-1'.encode())
+#        conn.send('-1'.encode())
