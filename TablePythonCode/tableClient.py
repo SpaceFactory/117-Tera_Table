@@ -15,38 +15,30 @@ s.connect(('192.168.1.61', port))
 
 while True:
  try:
-
-    input("Press to restart ")
-    instruct = """{
-    "command": "goto",
-    "speed": 100,
-    "points": [129,119,109,99,89]
-    }"""
-    s.send(instruct.encode())
-    data = str((s.recv(1024)).decode())
-    print(data)
-
-
-    instruct = """{
-    "command": "goto@",
-    "speed": 100,
-    "point":130
-    }"""
-    input("Press to observe delay ")
-    s.send(instruct.encode())
-    data = str((s.recv(1024)).decode())
-
     while True:
-        instruct = """{
-        "command": "getCurrentIndex",
-        }"""
-        s.send(instruct.encode())
-        data = str((s.recv(1024)).decode())
-        print(data)
-        time.sleep(1)
+
+       instruct = """{
+       "command": "goto",
+       "speed":20,
+       "point":180
+       }"""
+       s.send(instruct.encode())
+       data = str((s.recv(1024)).decode())
+       print('goto command to executed, should cause error if table is already at  ',data)
 
 
-    time.sleep(2)
+       time.sleep(5)
+
+       instruct = """{
+       "command": "eStop"
+       }"""
+       s.send(instruct.encode())
+       data = str((s.recv(1024)).decode())
+       print('estop sent ',data)
+
+
+
+       time.sleep(100)
 
    #s.close()
    #"points": [60,61,62,63,64,65,66,67,68,69,70,71,72,73,80]

@@ -23,7 +23,10 @@ s.listen(1)
 
 # some global variables for the PLC Thread
 plc_ip_address = '192.168.1.5'
-accuracy_desired = 0.1  # accuracy desired in degree
+# accuracy desired in degree
+accuracy_desired = 0.1
+#table precision, set it to a value lower than accuracy_desired
+table_precision  = 0.01
 message_json = None
 command = None
 
@@ -87,7 +90,7 @@ def reset():
     _resp = c.read_tag(['Set_Home'])
     if _resp[0][1] == 1:
         print("Setting Home: ", c.write_tag(('Set_Home', 0, 'BOOL')))
-    #print("Gear Ratio:", c.write_tag('Gear_Ratio',0.9793333, 'REAL'))
+    print("Gear Ratio:", c.write_tag('Gear_Ratio',0.9793333, 'REAL'))
 
 
 def gotoMotion(angle, speed, direction):
@@ -154,6 +157,20 @@ def readPosition():
         return -1
 
 
+def readPositionByOpeningConnection():
+    try:
+        c.open(plc_ip_address)
+        position = (c.read_tag(['FB_Position']))
+        position_angle = position[0][1]
+        c.close()
+        return position_angle
+
+    except:
+        print('Exception encountered in readPosition')
+        return -1
+
+
+
 # resets the driver
 def resetDriver():
     try:
@@ -191,7 +208,7 @@ def motionControl():
     while True:
         #print('"', command, '"')
         if command is not None:
-            if(command == 'goto'):
+            if(command == 'goThroughPoints'):
                 curr_index = -1
                 speed = message_json['speed']
                 points = message_json['points']
@@ -202,10 +219,16 @@ def motionControl():
                 diff2 = 1 if (points[2] - points[1]) > 0 else -1
                 diff3 = 1 if (points[3] - points[2]) > 0 else -1
                 direction = 1 if (diff1 + diff2 + diff3) > 0 else 2
-
-                returned_value = gotoMotion(stop_point, speed, direction)
-                print('Goto executed')
-                conn.send(str("ok").encode())
+                current_position = readPositionByOpeningConnection()
+                #
+                if( (180 - abs(abs(stop_point- current_position) -180))  > table_precision):
+                 returned_value = gotoMotion(stop_point, speed, direction)
+                else:
+                 returned_value = True
+                print('goThroughPoints executed')
+                #for gothroughpoints response conn.send is sent from main loop
+                #modify this later to maintain uniformity
+                #conn.send(str("oKFromGoThrough").encode())
 
             # if command is relative
             elif(command == 'relative'):
@@ -222,7 +245,7 @@ def motionControl():
                 command = None
                 conn.send(str(returned_value).encode())
 
-            #  if command is  setHome
+            # if command is  setHome
             elif(command == 'setHome'):
                 returned_value = setHome()
                 command = None
@@ -240,40 +263,35 @@ def motionControl():
                 command = None
                 conn.send(str(returned_value).encode())
 
-            #  if command is  setHome
-            elif(command == 'goto@'):
+            # if command is  setHome
+            elif(command == 'goto'):
                 curr_index = -1
                 speed = message_json['speed']
                 stop_point = message_json['point']
                 direction = 3 #best way
-                returned_value = gotoMotion(stop_point, speed, direction)
-                print('Goto@ executed')
+
+                current_position = readPositionByOpeningConnection()
+                if( (180 - abs(abs(stop_point- current_position) -180))  > table_precision):
+                 returned_value = gotoMotion(stop_point, speed, direction)
+                else:
+                  returned_value = True
                 conn.send(str("ok").encode())
 
 
-            # # if command is getPosition
-            # elif(command == 'getCurrentIndex'):
-            #     global curr_index
-            #     print(curr_index)
-            #     returned_value = resetDriver()
-            #     command = None
-
-            # if command is other
             else:
                 print('No proper command sent')
                 returned_value = False
                 command = None
                 conn.send(str(returned_value).encode())
 
-            #if command is goto@ send the last update
-            if(returned_value and command == 'goto@'):
+            #if command is goto send the last update
+            if(returned_value and command == 'goto'):
                c.open(plc_ip_address)
                current_position = readPosition()
                final_position = (message_json['point'])
-               print('inside got@')
+               print('inside goto')
                while(abs(final_position - current_position) > accuracy_desired):
                    current_position = readPosition()
-                   #print('current_position in goto@ ',current_position)
                    time.sleep(0.01)
                curr_index =  0
                c.close()
@@ -281,7 +299,7 @@ def motionControl():
 
 
             # sending periodic updates if the command is goto
-            if (returned_value and command == 'goto'):
+            if (returned_value and command == 'goThroughPoints'):
                 _points = message_json['points']  # an array of points
                 _completed = [0]
                 _remaining = points
@@ -323,32 +341,34 @@ conn, addr = s.accept()
 print("Got new connection and waiting for data")
 while True:
     try:
-        message = ""
         data = conn.recv(1024)
-        if "goto" in str(data):
+        if "goThroughPoints" in str(data):
             curr_index = -1
             conn.send("OK".encode())
-            message = message + str(data)
+            message = str(data)
             while '}' not in str(data):
                 data = conn.recv(1024)
                 conn.send("OK".encode())
                 message = message + str(data)
 
             message_json = json.loads(str(message))
-            command = 'goto'
+            command = 'goThroughPoints'
+
         #this goto command just send one feedback at the end
-        if "goto@" in str(data):
+        elif "goto" in str(data):
             curr_index = -1
-            message_json = json.loads(str(message))
-            command = 'goto@'
+            message_json = json.loads(str(data))
+            command = 'goto'
 
 
-        if "getCurrentIndex" in str(data):
-           #print("request from robot ")
-           #print(curr_index)
-           #print(curr_index);
+        elif "getCurrentIndex" in str(data):
            conn.send(str(curr_index).encode())
-           #print('finished sending to client')
+
+        else :
+           print('No proper command sent')
+           command = None
+           conn.send("No Proper Coomand".encode())
+
 
     except socket.error as e:
         print('    ')
@@ -371,10 +391,9 @@ while True:
         conn.send('-1'.encode())
 
     except Exception as e:
-#        print('    ')
         print('Inside final exception ', e)
-#        print('    ')
-#        time.sleep(2)
+#       print('    ')
+#       time.sleep(2)
         #stop/table in case of error
         #resetDriver()
         #send value -1 to indicate False or error
