@@ -364,6 +364,7 @@ while True:
         elif "getCurrentIndex" in str(data):
            conn.send(str(curr_index).encode())
 
+
         else :
            print('No proper command sent')
            command = None
